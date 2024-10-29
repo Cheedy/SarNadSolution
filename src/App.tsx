@@ -3,11 +3,14 @@ import { Sun, Moon } from 'lucide-react';
 import { sampleData } from './data/installers';
 import SearchBar from './components/SearchBar';
 import InstallerCard from './components/InstallerCard';
+import LoginForm from './components/LoginForm';
+import { useTheme } from './hooks/useTheme';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('Paris');
   const [searchType, setSearchType] = useState<'localisation' | 'nom'>('localisation');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useTheme();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const filteredInstallers = useMemo(() => {
     if (!searchTerm && searchType === 'localisation') {
@@ -37,8 +40,38 @@ function App() {
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
   };
+
+  const handleLogin = (password: string) => {
+    if (password === 'SarahNada') {
+      setIsAuthenticated(true);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <div className="fixed top-4 right-4">
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-gray-600' 
+                : 'bg-gray-100 hover:bg-gray-200'
+            } transition-colors`}
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? (
+              <Sun className="h-5 w-5 text-yellow-500" />
+            ) : (
+              <Moon className="h-5 w-5 text-gray-600" />
+            )}
+          </button>
+        </div>
+        <LoginForm onLogin={handleLogin} isDarkMode={isDarkMode} />
+      </>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
